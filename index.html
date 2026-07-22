@@ -168,11 +168,24 @@
       </section>
     </main>
 
+    <!-- ===== AMIGO TAB ===== -->
+    <main id="tab-amigo" class="tab hidden">
+      <div id="chat-messages"></div>
+      <div class="chat-bottom">
+        <div class="chat-chips chip-row" id="chat-chips"></div>
+        <div class="chat-input-row">
+          <input id="chat-input" type="text" placeholder="Typ tegen Amigo…" autocomplete="off">
+          <button id="chat-send">➤</button>
+        </div>
+      </div>
+    </main>
+
     <!-- ===== Tab bar ===== -->
     <nav id="tabbar">
       <button data-tab="gym" class="active"><span class="ico">🏋️</span>Gym</button>
       <button data-tab="food"><span class="ico">🍎</span>Food</button>
       <button data-tab="goals"><span class="ico">🎯</span>Goals</button>
+      <button data-tab="amigo"><span class="ico">🤖</span>Amigo</button>
     </nav>
 
     <!-- ===== Session builder sheet ===== -->
@@ -229,5 +242,6 @@
   <script src="data.js"></script>
   <script src="app.js"></script>
   <script src="cloud.js"></script>
+  <script src="amigo.js"></script>
 </body>
 </html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>GymAmigo</title>
+  <meta name="description" content="GymAmigo — jouw gym-, voedings- en doelen-tracker">
+  <meta name="theme-color" content="#0d0f14">
+  <link rel="manifest" href="manifest.webmanifest">
+  <!-- iOS PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GymAmigo">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" href="icons/icon-180.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ===== Onboarding ===== -->
+    <div id="onboarding" class="overlay hidden">
+      <div class="onboard-card">
+        <div class="logo-big">💪</div>
+        <h1>GymAmigo</h1>
+        <p class="muted">Vul je gegevens in, dan berekenen we jouw persoonlijke doelen en trainingsschema.</p>
+        <label>Naam</label>
+        <input id="ob-name" type="text" placeholder="Bijv. Ryan" autocomplete="off">
+        <label>Geslacht</label>
+        <div class="seg" id="ob-gender">
+          <button data-v="m" class="active">Man</button>
+          <button data-v="f">Vrouw</button>
+        </div>
+        <div class="row2">
+          <div>
+            <label>Leeftijd</label>
+            <input id="ob-age" type="number" inputmode="numeric" placeholder="jaar">
+          </div>
+          <div>
+            <label>Gewicht (kg)</label>
+            <input id="ob-weight" type="number" inputmode="decimal" placeholder="kg">
+          </div>
+        </div>
+        <label>Lengte (cm)</label>
+        <input id="ob-height" type="number" inputmode="numeric" placeholder="cm">
+        <label>Hoe actief ben je (buiten de sportschool)?</label>
+        <select id="ob-activity">
+          <option value="1.2">Weinig actief (zittend werk)</option>
+          <option value="1.375" selected>Licht actief</option>
+          <option value="1.55">Redelijk actief</option>
+          <option value="1.725">Zeer actief</option>
+        </select>
+        <label>Wat is je doel?</label>
+        <div class="goal-pick" id="ob-goal">
+          <button data-v="afvallen">🔥<span>Afvallen</span></button>
+          <button data-v="spieropbouw" class="active">💪<span>Spieropbouw</span></button>
+          <button data-v="onderhoud">⚖️<span>Onderhoud</span></button>
+        </div>
+        <button class="btn-primary" id="ob-save">Start met GymAmigo</button>
+      </div>
+    </div>
+
+    <!-- ===== Header ===== -->
+    <header id="header">
+      <div>
+        <div class="hello" id="hdr-hello">Hoi!</div>
+        <div class="date" id="hdr-date"></div>
+      </div>
+      <div class="streak" id="hdr-streak" title="Trainingsstreak">🔥 0</div>
+    </header>
+
+    <!-- ===== GYM TAB ===== -->
+    <main id="tab-gym" class="tab">
+      <section class="card week-card">
+        <div class="card-title">Deze week</div>
+        <div class="week-dots" id="week-dots"></div>
+        <div class="week-stats" id="week-stats"></div>
+      </section>
+
+      <div class="row2">
+        <button class="btn-primary big" id="btn-new-session">＋ Nieuwe sessie</button>
+        <button class="btn-secondary big" id="btn-schema">📋 Mijn schema</button>
+      </div>
+
+      <section class="card" id="schema-card" style="display:none">
+        <div class="card-head">
+          <div class="card-title">Jouw trainingsschema</div>
+          <button class="link-btn" id="btn-regen-schema">↻ Nieuw</button>
+        </div>
+        <div id="schema-days"></div>
+      </section>
+
+      <section>
+        <div class="section-title">Geschiedenis</div>
+        <div id="session-history"></div>
+      </section>
+    </main>
+
+    <!-- ===== FOOD TAB ===== -->
+    <main id="tab-food" class="tab hidden">
+      <div class="date-nav">
+        <button id="food-prev">‹</button>
+        <div id="food-date">Vandaag</div>
+        <button id="food-next">›</button>
+      </div>
+
+      <section class="card">
+        <div class="macro-ring-wrap">
+          <svg viewBox="0 0 120 120" class="ring" id="kcal-ring">
+            <circle cx="60" cy="60" r="52" class="ring-bg"/>
+            <circle cx="60" cy="60" r="52" class="ring-val" id="kcal-ring-val"/>
+          </svg>
+          <div class="ring-center">
+            <div id="kcal-eaten" class="ring-num">0</div>
+            <div class="ring-sub">van <span id="kcal-target">2000</span> kcal</div>
+          </div>
+        </div>
+        <div class="macro-bars">
+          <div class="mb"><div class="mb-head"><span>Eiwit</span><span id="prot-txt">0 / 0 g</span></div><div class="bar"><div id="prot-bar" class="fill p"></div></div></div>
+          <div class="mb"><div class="mb-head"><span>Koolhydraten</span><span id="carb-txt">0 / 0 g</span></div><div class="bar"><div id="carb-bar" class="fill c"></div></div></div>
+          <div class="mb"><div class="mb-head"><span>Vet</span><span id="fat-txt">0 / 0 g</span></div><div class="bar"><div id="fat-bar" class="fill f"></div></div></div>
+        </div>
+      </section>
+
+      <button class="btn-primary big" id="btn-add-food">＋ Voeding toevoegen</button>
+
+      <section>
+        <div class="section-title">Gegeten <span id="food-day-label"></span></div>
+        <div id="food-list"></div>
+      </section>
+    </main>
+
+    <!-- ===== GOALS TAB ===== -->
+    <main id="tab-goals" class="tab hidden">
+      <section class="card">
+        <div class="card-head">
+          <div class="card-title">Mijn doel</div>
+          <button class="link-btn" id="btn-edit-profile">✎ Profiel</button>
+        </div>
+        <div class="goal-pick" id="goal-pick">
+          <button data-v="afvallen">🔥<span>Afvallen</span></button>
+          <button data-v="spieropbouw">💪<span>Spieropbouw</span></button>
+          <button data-v="onderhoud">⚖️<span>Onderhoud</span></button>
+        </div>
+      </section>
+
+      <section class="card" id="goal-advice"></section>
+
+      <section class="card">
+        <div class="card-head">
+          <div class="card-title">Gewicht bijhouden</div>
+          <button class="link-btn" id="btn-log-weight">＋ Weeg-moment</button>
+        </div>
+        <div id="weight-chart-wrap"><svg id="weight-chart" viewBox="0 0 320 140" preserveAspectRatio="none"></svg></div>
+        <div id="weight-info" class="muted small"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-title">Gegevens</div>
+        <div class="row2">
+          <button class="btn-secondary" id="btn-export">⬇ Exporteer data</button>
+          <button class="btn-secondary" id="btn-import">⬆ Importeer data</button>
+        </div>
+        <input type="file" id="import-file" accept=".json" style="display:none">
+      </section>
+    </main>
+
+    <!-- ===== Tab bar ===== -->
+    <nav id="tabbar">
+      <button data-tab="gym" class="active"><span class="ico">🏋️</span>Gym</button>
+      <button data-tab="food"><span class="ico">🍎</span>Food</button>
+      <button data-tab="goals"><span class="ico">🎯</span>Goals</button>
+    </nav>
+
+    <!-- ===== Session builder sheet ===== -->
+    <div id="sheet-session" class="sheet hidden">
+      <div class="sheet-inner">
+        <div class="sheet-head">
+          <button class="link-btn danger" id="sess-cancel">Annuleer</button>
+          <div class="sheet-title">Gymsessie</div>
+          <button class="link-btn" id="sess-save">Opslaan</button>
+        </div>
+        <div id="sess-exercises"></div>
+        <button class="btn-secondary big" id="sess-add-ex">＋ Oefening toevoegen</button>
+        <div class="sess-live" id="sess-live"></div>
+      </div>
+    </div>
+
+    <!-- ===== Exercise picker sheet ===== -->
+    <div id="sheet-expick" class="sheet hidden">
+      <div class="sheet-inner">
+        <div class="sheet-head">
+          <button class="link-btn danger" id="expick-close">Sluit</button>
+          <div class="sheet-title">Kies oefening</div>
+          <span style="width:60px"></span>
+        </div>
+        <input type="search" id="expick-search" placeholder="Zoek oefening…" autocomplete="off">
+        <div class="chip-row" id="expick-chips"></div>
+        <div id="expick-list"></div>
+      </div>
+    </div>
+
+    <!-- ===== Food picker sheet ===== -->
+    <div id="sheet-foodpick" class="sheet hidden">
+      <div class="sheet-inner">
+        <div class="sheet-head">
+          <button class="link-btn danger" id="foodpick-close">Sluit</button>
+          <div class="sheet-title">Voeding toevoegen</div>
+          <span style="width:60px"></span>
+        </div>
+        <input type="search" id="foodpick-search" placeholder="Zoek voedingsmiddel…" autocomplete="off">
+        <div id="foodpick-recent"></div>
+        <div id="foodpick-list"></div>
+        <button class="btn-secondary big" id="btn-custom-food">＋ Eigen product toevoegen</button>
+      </div>
+    </div>
+
+    <!-- ===== Amount / generic modal ===== -->
+    <div id="modal" class="overlay hidden">
+      <div class="modal-card" id="modal-card"></div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -13,7 +13,11 @@ function load() {
   } catch (e) { /* corrupt data → fresh start */ }
   return { profile: null, goal: "spieropbouw", sessions: [], foodLog: {}, weights: [], customFoods: [], recentFoods: [], schema: null };
 }
-function save() { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
+function save() {
+  S._ts = Date.now();
+  localStorage.setItem(STORE_KEY, JSON.stringify(S));
+  if (typeof schedulePush === "function") schedulePush();
+}
 
 // ---------- Helpers ----------
 const DAYS = ["zondag", "maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag"];
@@ -741,6 +745,7 @@ function render() {
   if (S.schema) renderSchema();
   renderFood();
   renderGoals();
+  if (typeof renderAccount === "function") renderAccount();
 }
 
 // ---------- Init ----------

@@ -1,11 +1,12 @@
 // GymAmigo service worker — cache-first zodat de app offline werkt
-const CACHE = "gymamigo-v1";
+const CACHE = "gymamigo-v2";
 const ASSETS = [
   "./",
   "./index.html",
   "./style.css",
   "./data.js",
   "./app.js",
+  "./cloud.js",
   "./manifest.webmanifest",
   "./icons/icon-180.png",
   "./icons/icon-512.png",
